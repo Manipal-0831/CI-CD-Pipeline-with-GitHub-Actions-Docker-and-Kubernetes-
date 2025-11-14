@@ -1,0 +1,45 @@
+name: CI/CD Pipeline (Build, Test, Push)
+
+on:
+  push:
+    branches:
+      - main # Trigger on push to the main branch
+
+env:
+  # The full name of the Docker image
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/cicd-minikube-app
+  # Use the Git SHA for an immutable tag
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # CI Step: Run Tests
+      - name: Run Application Tests
+        run: npm test
+      
+      # CI/CD Step 1: Log in to Docker Hub using secrets
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      # CI/CD Step 2: Set up Docker Buildx (for better building/caching)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      # CI/CD Step 3: Build and Push Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:latest
+            ${{ env.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
+          # The tags create two versions: 'latest' and the specific Git SHA

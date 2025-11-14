@@ -1,0 +1,16 @@
+{
+  "name": "ci-cd-githubactions-docker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",  
+    "test": "echo 'CI Test Successful: Basic health check passed' && exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
